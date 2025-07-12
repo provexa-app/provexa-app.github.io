@@ -69,7 +69,7 @@
       <div class="columns is-centered">
         <div class="column has-text-centered">
           <img src="./static/images/provexa.png" alt="Provexa Logo" style="max-width:150px; margin-bottom: 20px;">
-          <h3 class="title is-1 publication-title">
+          <h3 class="title is-1 publication-title" style="font-size: 2.9rem;">
             <span class="dnerf">Provexa</span>: Enabling Efficient Attack Investigation via Human-in-the-Loop Security Analysis
           </h3>
           <div class="is-size-5 publication-authors">
@@ -126,7 +126,7 @@
               </span>
               <!-- Code Link. -->
               <span class="link-block">
-                <a target="_blank" href="https://github.com/peng-gao-lab/raptor-release"
+                <a target="_blank" href="https://github.com/peng-gao-lab/Provexa"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fab fa-github"></i>
@@ -134,17 +134,7 @@
                   <span>Code</span>
                   </a>
               </span>
-              <!-- Dataset Link. -->
-              <span class="link-block">
-                <a target="_blank" href="https://github.com/google/nerfies/releases/tag/0.1"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="far fa-images"></i>
-                  </span>
-                  <span>Data</span>
-                  </a>
             </div>
-
           </div>
         </div>
       </div>
@@ -157,25 +147,12 @@
     <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
+        <h1 class="title is-3" style="font-size: xxx-large;">Overview</h1>
         <div class="content has-text-justified">
-          <p>
-            System auditing is a vital technique for collecting system call events
-            as system provenance and investigating complex multi-step attacks
-            such as Advanced Persistent Threats. However, existing attack investigation 
-            methods struggle to uncover long attack sequences due
-            to the massive volume of system provenance data and their inability
-            to focus on attack-relevant parts. </p>
-            
-            <p>In this paper, we present <span class="dnerf">Provexa</span>, a defense system that enables human analysts to effectively
-            analyze large-scale system provenance to reveal multi-step attack
-            sequences. Provexa introduces an expressive domain-specific language, ProvQL, that offers essential primitives for various types
-            of attack analyses (e.g., attack pattern search, attack dependency
-            tracking) with user-defined constraints, enabling analysts to focus
-            on attack-relevant parts and iteratively sift through the large provenance data. Moreover, Provexa provides an optimized execution
-            engine for efficient language execution. Our extensive evaluations
-            on a wide range of attack scenarios demonstrate the practical effectiveness of Provexa in facilitating timely attack investigation.
-          </p>
+            <span class="dnerf"><strong>Provexa</strong></span> is an interactive investigation system that helps analysts uncover complex, 
+            multi-stage cyberattacks from massive system audit logs. It introduces a powerful query language (ProvQL) for 
+            attack pattern search and causal tracking, coupled with an optimized engine and notebook-style UI. 
+            By filtering out irrelevant events and supporting human-in-the-loop analysis, Provexa reduces noise and dramatically improves investigation speed, accuracy, and usability over traditional methods.
         </div>
       </div>
     </div>
@@ -183,47 +160,156 @@
   </div>
 </section>
 
-<section class="section">
-  <div class="container" style="margin-bottom: 2vh;">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Provexa Overview</h2>
-        <div class="content has-text-justified">
-          <img src="./static/images/provexa-arch.jpg" alt="Provexa Architecture" style="width:100%; height:auto;"/>
-        </div>
-      </div>
-    </div>
-</div>
-</section>
-
-
-<section class="section">
-  <div class="container" style="margin-bottom: 2vh;">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Motivating Example</h2>
-        <div class="content has-text-justified">
-          <img src="./static/images/demo.jpg" alt="Provexa Architecture" style="width:100%; height:auto;"/>
-        </div>
-      </div>
-    </div>
-</div>
-</section>
-
-<section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@misc{yang2024enablingefficientattackinvestigation,
-      title={Enabling Efficient Attack Investigation via Human-in-the-Loop Security Analysis}, 
-      author={Saimon Amanuel Tsegai and Xinyu Yang and Haoyuan Liu and Peng Gao},
-      year={2024},
-      eprint={2211.05403},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2211.05403},
-  }
-  </code></pre>
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+    <h1 class="title is-1 mmmu">Motivating Example</h1>
   </div>
+</section>
+
+<section class="section">
+  <div class="container" style="margin-bottom: 2vh;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <!-- <h2 class="title is-3">Motivating Example</h2> -->
+        <div class="content has-text-justified">
+          <div style="display: flex; justify-content: center;">
+            <img src="./static/images/demo.jpg" alt="Provexa Demo" style="max-width:100%; height:auto;"/>
+          </div>
+          <br><br>
+          <p>
+            Sophisticated cyberattacks like APTs unfold over multiple hosts and stages, often blending into normal activity. Traditional forensic tools fail to cope due to:
+          </p>
+          <ul>
+            <li><strong>Massive event volume</strong>: Millions of daily system events overwhelm analysts.</li>
+            <li><strong>Dependency explosion</strong>: Causal tracing from a single alert brings in thousands of irrelevant nodes.</li>
+            <li><strong>Lack of analyst control</strong>: Existing systems don’t support iterative refinement or domain-informed filtering.</li>
+          </ul>
+          <p>
+            <strong><span class="dnerf">Provexa</span> solves this.</strong> Suppose an analyst starts with an alert involving suspicious data transfer. Instead of a bloated graph with 150,000+ edges, Provexa guides them to just the 20 attack-relevant steps by:
+          </p>
+          <ul>
+            <li>Searching for meaningful patterns (e.g., <code>curl</code> reading a tar file and writing to a network socket).</li>
+            <li>Tracing dependencies with fine-grained filters (e.g., exclude benign processes like <code>ping</code>).</li>
+            <li>Binding and refining intermediate results to iteratively converge on the full attack path.</li>
+          </ul>
+          <p>
+            The result: a dramatic reduction in search space (up to <strong>58,000×</strong>) and much higher accuracy than traditional tools. Provexa supports real-world workflows that adapt to evolving attacks, enabling fast, focused, and explainable investigations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+    <h1 class="title is-1 mmmu">Design Overview</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="margin-bottom: 2vh;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <!-- <h2 class="title is-3">Design Overview</h2> -->
+        <div class="content has-text-justified">
+          <div style="display: flex; justify-content: center;">
+            <img src="./static/images/provexa-arch.jpg" alt="Provexa Architecture" style="max-width:70%; height:auto;"/>
+          </div>
+          <br><br>
+          <p>
+            <span class="dnerf"><strong>Provexa</strong></span> is a human-in-the-loop investigation platform designed to uncover sophisticated, multi-stage cyberattacks by analyzing massive volumes of system audit data. At its core lies <strong>ProvQL</strong>, a powerful domain-specific language tailored for security analysts working over <em>system provenance graphs</em>.
+          </p>
+          <p>
+            The architecture comprises lightweight <strong>system agents</strong> that collect OS-level events (file, process, and network interactions), which are then parsed and stored in <strong>graph or relational databases</strong>. These events are transformed into provenance graphs where nodes represent system entities and edges represent causal event relationships.
+          </p>
+          <p>
+            Analysts interact with Provexa via a <strong>notebook-style UI</strong> that enables constructing queries, visualizing results, and progressively refining hypotheses. Two core primitives support investigation:
+          </p>
+          <ul>
+            <li><strong>Attack Pattern Search</strong>: Search for suspicious multi-event behavior patterns (e.g., data exfiltration, remote access).</li>
+            <li><strong>Causal Dependency Tracking</strong>: Uncover chains of events leading to or resulting from an attack indicator.</li>
+          </ul>
+          <p>
+            The <strong>domain-aware query engine</strong> intelligently schedules subqueries for optimized performance, and an <strong>in-memory management</strong> supports fast, iterative analysis. This architecture empowers analysts to stay focused on what matters — surfacing relevant attack behaviors without wading through irrelevant noise.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+    <h1 class="title is-1 mmmu">Key Takeaways</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="margin-bottom: 2vh;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <!-- <h2 class="title is-3">Key Takeaways</h2> -->
+        <div class="content has-text-justified">
+          <ul>
+            <li><strong>🔍 Massive Reduction in Noise:</strong> Provexa filters out irrelevant events, achieving up to <strong>58,000× reduction</strong> in provenance graph size and isolating only the attack-relevant paths.</li>
+
+            <li><strong>🧠 Human-Centric Querying:</strong> ProvQL empowers analysts to express high-level patterns and causal hypotheses with precision, while retaining control over filters, constraints, and graph traversal semantics.</li>
+
+            <li><strong>🚀 Complementary Optimization Layer:</strong> Provexa acts as an intelligent pre-processing layer that reduces the query burden on the backend database. The system performs even better when the underlying engine is optimized, leading to lower execution time and reduced running cost.</li>
+
+            <li><strong>🧪 User Study Results:</strong>
+              <ul>
+                <li>Rated highest in usability, learnability, and task success.</li>
+                <li>Users completed investigations with <strong>fewer iterations</strong> and more confidence than with SQL or Cypher.</li>
+                <li>Provexa was preferred by nearly all participants for real-world use.</li>
+              </ul>
+            </li>
+
+            <li><strong>📊 Faster, Iterative Investigations:</strong> Provexa achieves faster query execution through in-memory result management, allowing reuse of intermediate results across queries, a feature not supported in general-purpose query languages. This leads to subsecond response times and supports fluid, iterative analyst workflows.</li>
+
+            <li><strong>📈 Beyond Database Optimization:</strong> Our experiments show that Provexa improves execution time and cost by orders of magnitude beyond what can be achieved through backend database optimizations alone. It serves as a powerful optimization layer that amplifies performance even when the underlying database is fully tuned.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr>
+
+<section class="section has-text-centered">
+  <div class="container">
+    <h2 class="title is-4">Want to Dive Deeper?</h2>
+    <p class="content">
+For more details on attack scenarios, example queries, and experimental results, check our full appendix page:
+    </p>
+    <a class="button is-link is-medium" href="additional-details.html">
+      View Full Appendix →
+    </a>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container" style="margin-bottom: 2vh;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">BibTex</h2>
+        <div class="content has-text-justified">
+      <pre><code>@misc{yang2024enablingefficientattackinvestigation,
+    title={Enabling Efficient Attack Investigation via Human-in-the-Loop Security Analysis}, 
+    author={Saimon Amanuel Tsegai and Xinyu Yang and Haoyuan Liu and Peng Gao},
+    year={2024},
+    eprint={2211.05403},
+    archivePrefix={arXiv},
+    primaryClass={cs.CR},
+    url={https://arxiv.org/abs/2211.05403},
+}
+          </code></pre>
+        </div>
+      </div>
+    </div>
+</div>
 </section>
 
 <section>

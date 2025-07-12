@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supplementary Information - Provexa</title>
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/provexa-logo.png">
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="index.html">
+        <span class="icon">
+          <i class="fas fa-home"></i>
+        </span>
+        <span>Return to Home Page</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="section" style="padding-bottom: 0;">
+  <div class="container has-text-centered">
+    <h1 class="title is-2">Appendix</h1>
+    <p class="subtitle is-4">
+      Explore detailed experimental results, setup information, and supplementary materials related to <span class="dnerf">Provexa</span>.
+    </p>
+    <hr>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-3" >Table of Contents</h1>
+    <div class="content">
+      <ul>
+        <li><a href="#descriptions-of-attack-cases">Descriptions of Attack Cases Used in Evaluations</a></li>
+        <li><a href="#example-queries">Example Queries</a></li>
+        <li><a href="#survey-questions-and-results">Survey Questions and Results</a></li>
+        <li><a href="#database-optimization-configurations">Database Optimization Configurations</a></li>
+        <li><a href="#multi-query-splitting-analysis">Multi-Query Splitting Analysis</a></li>
+        <li><a href="#all-queries">All Evaluation Queries</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="descriptions-of-attack-cases">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Descriptions of Attack Cases Used in Evaluations</h1>
+    <div class="content">
+      <p>
+        Attacks based on commonly used exploits.
+        <ul>
+            <li><b>Wget Executable (Case malicious_wget)</b>: The attacker uses wget to download an executable script and executes it.</li>
+            <li><b>Illegal Storage (Case malicious_illegal_store)</b>: A server administrator uses wget to download suspicious files to other users' home directory.</li>
+            <li><b>Hide File (Case malicious_hide_file)</b>: The attacker downloads a malicious file and hides it by changing its file name and location.</li>
+            <li><b>Backdoor Download (Case malicious_backdoor_dl)</b>: A malicious insider uses wget to download the backdoor malware from a compromised server and hides it among normal files.</li>
+            <li><b>Annoying Server User (Case malicious_server_usr)</b>: The annoying user logs into other users' home directories on a vulnerable server and downloads a script to write some garbage data.</li>
+            <li><b>Password-Free Theft (Case malicious_ssh_theft)</b>: The attacker logs into other users' server via ssh and appends her public key to the ~/.ssh/authorized_keys file to leave a persistent backdoor.</li>
+            <li><b>Wget-GCC-Crash (Case malicious_gcc_crash)</b>: The attacker logs into other's server via ssh, uses wget to download a C source code file, and uses GCC to compile it. The attacker then executes this malicious executable file to exhaust the memory and crash the system.</li>
+            <li><b>Scan and Login (Case malicious_scan_login)</b>: The attacker uses Nmap to explore the accessible servers whose port 22 is open for SSH connection. The attacker then uses a script to automatically test if there exists a password-less login with SSH keys to the discovered servers.</li>
+            <li><b>Password Reuse (Case malicious_pwd_reuse)</b>: An administrator decodes the /etc/shadow file with the John the Ripper password cracker, and uses the cracked password to login as another user.</li>
+            <li><b>Cheating Student (Case malicious_student)</b>: A cheating student hacks into her school's Apache server and downloads midterm scores.</li>
+        </ul>
+      </p>
+      <p>
+        <br>
+        <span style="font-weight: 600;">Multi-host multi-step intrusive attacks</span><br>
+        The attacker used an external host (Command & Control (C2) server) to perform initial penetration, distribute malware, and exfiltrate data. The first host compromised by the attacker is named as Host 1, which is a starting point to perform lateral movement and other malicious actions to compromise more hosts.
+        <ul>
+          <li><b>Shellshock Penetration (Case multistep_penetration)</b>: The attacker exploits the Shellshock vulnerability to execute arbitrary code on Host 1.</li>  
+          <li><b>Password Crack (Case multistep_password_crack)</b>: After the initial penetration on Host 1 in the previous attack, the attacker connects to Dropbox and downloads an image where C2 server's IP address is encoded in the image. Based on the IP, the attacker downloads a malware from the C2 server to Host 1. When the malware is executed, it scans the SSH configuration file to locate other reachable hosts in the network. After this discovery phase, the malware downloads another script from the C2 server and sends it to these discovered hosts to steal password from them.</li>
+          <li><b>Data Leakage (Case multistep_data_leakage)</b>: After compromising the discovered hosts, the attacker steals sensitive data files, by scanning the file system, putting files into a compressed file, and transferring it back to the C2 server.</li>
+          <li><b>Command-Line Injection (Case multistep_cmd_injection)</b>: The victim host runs Kodi Mediaplayer, which exports remote control API as a web service. One of its input sanitizations has an error that fails to filter invalid input from the outside, which in turn allows the attacker to inject arbitrary command blended in one of its requests.</li>
+          <li><b>Supply Chain Attack (Case multistep_supply_chain)</b>: The attacker discovers that the GNU Wget version that runs on a victim server is vulnerable to writing arbitrary files by deceptively redirecting requests from HTTP to a compromised FTP server (CVE-2016-4971). The attacker then embeds a common remote access trojan (RAT) into a Ubuntu package and compromises one of the Ubuntu repositories. In this way, when the victim server uses wget to download Ubuntu packages, the requests are redirected to the attacker's FTP server, and the downloaded package contains the RAT. When the victim installs the downloaded packages on the victim server, the RAT is triggered, establishing a C2 channel.</li>
+          <li><b>Phishing Email (Case multistep_phishing_email)</b>: A malicious Trojan is downloaded as an Email attachment and the enclosed macro is triggered by Microsoft Word. This allows the attacker to run arbitrary code in the context of the current user (CVE-2017-11882). After the initial penetration via the phishing email, the attacker steals sensitive data files from the compromised host.</li>
+          <li><b>Netcat Backdoor (Case multistep_netcat_backdoor)</b>: A malicious Trojan is downloaded by a victim user from a compromised HTTP server via a deceptive URL (CVE-2018-14574). The attacker penetrates into the victim host through the Trojan backdoor, and uses the netcat utility to maintain a persistent Netcat backdoor.</li>
+          <li><b>WannaCry (Case multistep_wannacry)</b>: An attacker exploits the EternalBlue vulnerability (CVE-2017-0146) in network to access the machines, and then encrypts data.</li>        
+        </ul>
+      </p>
+      <p>
+        <br>
+        <span style="font-weight: 600;">Real-world malware cases</span><br>
+        We obtained a dataset of free Windows malware samples from VirusSign. We focused on 5 largest categories (i.e., Trojan.Autorun, Trojan.Danger, Virus.Hijack, Virus.Infector, Virus.Sysbot), and we randomly selected 1 malware sample for each category.
+        <ul>
+          <li><b>Case malware_autorun</b>: Trojan.Autorun</li>
+          <li><b>Case malware_danger</b>: Trojan.Danger</li>
+          <li><b>Case malware_hijack</b>: Virus.Hijack</li>
+          <li><b>Case malware_infector</b>: Virus.Infector</li>
+          <li><b>Case malware_sysbot</b>: Virus.Sysbot</li>
+        </ul>
+      </p>
+
+      <p>
+        <br>
+        <span style="font-weight: 600;">DARPA TC attack cases</span><br>
+        We selected 3 attack cases from the DARPA Transparent Computing (TC) Engagement #5 data release. Specifically, 
+        the dataset consists of the captured system audit logs of six performer systems (i.e., ClearScope, FiveDirections, 
+        THEIA, TRACE, CADETS, and MARPLE) under the attack of the red team using different attack strategies. 
+        The audit logs include both benign system activities and attack activities. The dataset also includes a ground-truth 
+        report with attack descriptions and setups for the cases. We first retrieved the logs for the five performers with desktop
+        OS's (excluding ClearScope that runs Android). After examining the logs, we found that the logs for CADETS lack key
+        attributes (e.g., file name), making us unable to confirm the attack ground truth to conduct evaluations. In MARPLE, 
+        the attack failed. In TRACE, we found that forward tracking one step can reveal the attack sequence. Thus, we do not 
+        consider CADETS, MARPLE, and TRACE cases. Nevertheless, similar attacks were already performed for other performer systems 
+        and their logs are covered. For the other two performer systems, the attack cases for the same performer system are largely 
+        similar, and thus we selected at least one attack case from each system to include in our evaluation benchmark. To use the logs 
+        for evaluation, we developed a tool to parse the released logs and loaded the parsed system entities and system events into Provexa's databases.
+        <ul>
+            <li><b>Case tc_fivedirections_1</b>: 05092019 1326 - FiveDirections 2 - Firefox Drakon APT Elevate Copykatz Sysinfo</li>
+            <li><b>Case tc_fivedirections_2</b>: 05172019 1226 - FiveDirections 3 - Firefox DNS Drakon APT FileFilter-Elevate</li>
+            <li><b>Case tc_theia</b>: 05152019 1448 - THEIA 1 - Firefox Drakon APT BinFmt-Elevate Inject</li>
+        </ul>
+        </ul>
+       </p>
+
+       <p>
+        <br>
+        <span style="font-weight: 600;">ATLASv2 attack cases</span><br>
+        We selected 4 attack cases from the ATLASv2 Attack Engagement dataset. This dataset builds on the first version 
+        of the ATLAS dataset and includes audit logs recorded from various sources to increase the benign activities 
+        recorded to simulate a more realistic dataset with enough noise data to accompany the malicious system events. 
+        The dataset also includes a ground-truth report with attack descriptions and setups for the cases. In this dataset, 
+        two host machines were used for daily usage by two researchers to record benign activies for 4 days. In the fifth day, 
+        the malicious attacks were carried out while the victim hosts continued serving the daily use of the researchers. 
+        This captures realistic system logs that closely resemble real-world attack logs. We select 4 attack cases that involve 
+        different vulnerabilities in commonly used software - Adobe Flash and Microsoft Word.
+        <ul>
+            <li><b>Case atlasv2_s1</b>:  CVE-2015-5122    -  Adobe Flash Exploit</li>
+            <li><b>Case atlasv2_s2</b>:  CVE-2015-3105    -  Adobe Flash Exploit</li>
+            <li><b>Case atlasv2_s3</b>:  CVE-2017-11882  -  Microsoft Word Exploit</li>
+            <li><b>Case atlasv2_s4</b>:  CVE-2017-0199    -  Microsoft Word Exploit</li>
+        </ul>
+       </p>
+    </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="example-queries">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Example Queries</h1>
+    <div class="content">
+      <p>
+        We provide query examples written in different languages: ProvQL, SQL, Cypher, and Splunk SPL (search query only). 
+        We select <code>malicious_ssh_theft</code> as an example. Two queries (a backward tracking query, and a search query) are shown.<br><br>
+
+        <strong>Query 1: Backward Tracking From the POI Events</strong><br>
+        In the first query, the security analyst performs backward tracking from the POI event whose cmdline attribute contains authorized_keys.
+        <ol>
+          <li><b>ProvQL:</b> The security analyst uses the command line and type constraints to specify the POI event. The result is bound to variable bg_query1.<br>
+            <pre><code>bg_query1 = back track where (cmdline like 'authorized_keys', type=process) from db(malicious_ssh_theft);</code></pre>
+          </li>
+          <br><br>
+
+          <li><b>SQL:</b> In SQL, the security analyst uses Common Ta- ble Expressions (CTEs) to create a recursive query. WITH RECURSIVE 
+            defines recursive CTEs that unify all nodes and edges from different tables. Then, the security analyst uses SELECT 
+            to perform search.<br>
+            <pre><code>WITH RECURSIVE allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+nodes AS (SELECT * FROM allnodes),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent),
+edges AS (SELECT e.* FROM alledges e INNER JOIN nodes n1 ON e.srcid = n1.id
+INNER JOIN nodes n2 ON e.dstid = n2.id),
+graph (id, srcid, dstid, starttime, endtime, hostname, optype, amount, threshold, step) AS (
+SELECT *, edges.endtime, 1 FROM edges
+WHERE dstid IN (SELECT id FROM nodes WHERE (cmdline like authorized_keys) AND (type = process))
+UNION SELECT edges.*, LEAST(edges.endtime, graph.threshold), graph.step
+FROM edges JOIN graph ON edges.dstid = graph.srcid
+WHERE edges.starttime <= graph.threshold)
+SELECT DISTINCT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM graph;</code></pre>
+          </li>
+
+          <br><br>
+          <li><b>Cypher:</b> In Cypher, the security analyst first matches all the paths. Then, the security analyst writes
+            nested loops to traverse all relationships and joins the results.<br>
+            <pre><code></code>MATCH ()-[r]->(root)
+WHERE (root.cmdline  =~  authorized_keys) AND (root.type = process) 
+SET r.threshold = r.endtime, r.marked=true
+WITH root
+MATCH p = ()-[*..3]->(root)
+WITH DISTINCT relationships(p) as r
+FOREACH (i IN reverse(range(0, size(r)-2))
+| FOREACH (n1 IN [r[i]]
+| FOREACH (n2 IN [r[i+1]]
+| FOREACH (edge IN
+    CASE
+    WHEN n1.starttime <= n2.threshold THEN [n1]
+    ELSE []
+    END | SET edge.marked=true
+          SET n1.threshold=CASE 
+            WHEN n1.endtime > n2.threshold THEN n2.threshold
+            ELSE n1.endtime END))))
+WITH DISTINCT r
+MATCH (sn)-[rr]->(en)
+WHERE (rr IN r AND rr.marked=true)
+RETURN DISTINCT sn, rr, en</pre>
+      </p>
+    </ol>
+
+      <br><br>
+          
+      <p>
+        <strong>Query 2: Search for the Entry Nodes on the Backward Dependency Graph</strong><br>
+        In the second query, the security analyst searches for the attack entry nodes on the backward dependency graph.<br>
+        <ol>
+            <li><b>ProvQL:</b> Using ProvQL, the security analyst searches from bg_query1 bound to a local in-memory graph and specifies event relationships in a with clause. The result is bound to variable entry.<br>
+                <pre><code>search from bg_query1 where e1{exename like "ssh",type=process},
+e2{type=process}
+with e1->e2
+return * as entry;</code></pre>
+            </li>
+            <br><br>
+    
+            <li><b>SQL:</b> Since SQL does not support in-memory manage- ment, the security analyst needs to union all tables again. Then, the security analyst uses the SELECT clause to perform the search.<br>
+                <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+nodes AS (SELECT * FROM allnodes), alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent),
+edges AS (SELECT e.* FROM alledges e),
+event1 (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    nodes n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN nodes n2 ON edges.dstid = n2.id
+    WHERE ((n1.exename like ssh) AND (n1.type = process)) AND (n2.type = process) AND (edges.optype != null)),
+result AS (SELECT event1.* FROM event1 WHERE true)
+SELECT * FROM result;</code></pre>
+
+            </li>
+            <br><br>
+
+            <li><b>Cypher:</b> In Cypher, the security analyst uses MATCH to specify the pattern and uses WHERE to specify the constraints.<br>
+                <pre><code>MATCH (e1)-[event0]->(e2)
+WHERE (e1.exename =~ ssh) AND 
+(e1.type = process) AND
+e2.type = process AND true
+RETURN e1, e2, event0</code></pre>
+
+            </li>
+            <br><br>
+            <li><b>Splunk SPL:</b> In Splunk SPL, the security analyst searches different tables and uses join type=inner to join the results.<br>
+                <pre><code>| search index=process exename="ssh" type="process"
+| fields id
+| join type=inner id
+    [search index=processevent
+    | fields srcid, dstid, *]
+| join type=inner dstid
+    [search index=process type="process"
+    | fields id, *
+    | rename id as dstid]
+| table *</code></pre>
+        </ol>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="survey-questions-and-results">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Survey Questions and Results</h1>
+    <div class="content">
+      <p>
+        Detailed survey questions and results are presented below.
+      </p>
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <iframe src="https://drive.google.com/file/d/1PSalS7S_Rhf-HoMQI3wQUg5C5oejM2M1/preview" width="100%" height="600" allow="autoplay"></iframe>
+      </div>
+      <div class="column is-half">
+        <iframe src="https://drive.google.com/file/d/1617RZ4S7y-VcrYU6aKrDQlET7eb1OYRq/preview" width="100%" height="600" allow="autoplay"></iframe>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="database-optimization-configurations">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Database Optimization Configurations</h1>
+    <div class="content">
+      <p>
+        Detailed experiment setup and results are presented below.
+      </p>
+    <iframe src="https://zealous-taxicab-bd0.notion.site/ebd/201ff9ab77f080ac9279d42e990033c0?pvs=143" width="100%" height="800" style="border: none;" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="multi-query-splitting-analysis">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Multi-Query Splitting Analysis</h1>
+    <div class="content">
+      <p>
+        Explanation of multi-query splitting, illustrative examples, and analysis of its advantages.
+      </p>
+      <iframe src="https://zealous-taxicab-bd0.notion.site/ebd/201ff9ab77f08093824cc7a62469bb58?pvs=143" width="100%" height="800" style="border: none;" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="all-queries">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">All Evaluation Queries</h1>
+    <div class="content">
+      <p>
+        All evaluation queries used in the experiments can be downloaded from the following link:
+        <a href="https://drive.google.com/drive/folders/1Em6ZLsgWAlza-pBRtCrTc4EUz0-QdMme?usp=sharing" target="_blank">Provexa Evaluation Queries</a>.
+        <br>
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        © 2025 Provexa. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
