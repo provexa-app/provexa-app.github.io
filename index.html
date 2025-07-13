@@ -36,30 +36,6 @@
       <span aria-hidden="true"></span>
     </a>
   </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" target="_blank" href="https://github.com/peng-gao-lab">
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More Research
-        </a>
-        <div class="navbar-dropdown">
-          <a class="navbar-item" target="_blank" href="https://ctinexus.github.io">
-            <b>CTINexus</b>
-          </a>
-          <a class="navbar-item" target="_blank" href="https://github.com/peng-gao-lab/p4control">
-            <b>P4Control</b>
-          </a>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </nav> 
 
 
@@ -105,15 +81,6 @@
                   <span>Paper</span>
                 </a>
               </span>
-              <span class="link-block">
-                <a target="_blank" href="https://arxiv.org/abs/2211.05403"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="ai ai-arxiv"></i>
-                  </span>
-                  <span>arXiv</span>
-                </a>
-              </span>
               <!-- Video Link. -->
               <span class="link-block">
                 <a target="_blank" href="https://www.youtube.com/watch?v=tTndLF3fHJs"
@@ -143,80 +110,16 @@
 </section>
 
 <section class="section">
-  <div class="container is-max-desktop">
-    <!-- Abstract. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h1 class="title is-3" style="font-size: xxx-large;">Overview</h1>
-        <div class="content has-text-justified">
-            <span class="dnerf"><strong>Provexa</strong></span> is an interactive investigation system that helps analysts uncover complex, 
-            multi-stage cyberattacks from massive system audit logs. It introduces a powerful query language (ProvQL) for 
-            attack pattern search and causal tracking, coupled with an optimized engine and notebook-style UI. 
-            By filtering out irrelevant events and supporting human-in-the-loop analysis, Provexa reduces noise and dramatically improves investigation speed, accuracy, and usability over traditional methods.
-        </div>
-      </div>
-    </div>
-    <!--/ Abstract. -->
-  </div>
-</section>
-
-<section class="hero is-light is-small">
-  <div class="hero-body has-text-centered">
-    <h1 class="title is-1 mmmu">Motivating Example</h1>
-  </div>
-</section>
-
-<section class="section">
   <div class="container" style="margin-bottom: 2vh;">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <!-- <h2 class="title is-3">Motivating Example</h2> -->
-        <div class="content has-text-justified">
-          <div style="display: flex; justify-content: center;">
-            <img src="./static/images/demo.jpg" alt="Provexa Demo" style="max-width:100%; height:auto;"/>
-          </div>
-          <br><br>
-          <p>
-            Sophisticated cyberattacks like APTs unfold over multiple hosts and stages, often blending into normal activity. Traditional forensic tools fail to cope due to:
-          </p>
-          <ul>
-            <li><strong>Massive event volume</strong>: Millions of daily system events overwhelm analysts.</li>
-            <li><strong>Dependency explosion</strong>: Causal tracing from a single alert brings in thousands of irrelevant nodes.</li>
-            <li><strong>Lack of analyst control</strong>: Existing systems don’t support iterative refinement or domain-informed filtering.</li>
-          </ul>
-          <p>
-            <strong><span class="dnerf">Provexa</span> solves this.</strong> Suppose an analyst starts with an alert involving suspicious data transfer. Instead of a bloated graph with 150,000+ edges, Provexa guides them to just the 20 attack-relevant steps by:
-          </p>
-          <ul>
-            <li>Searching for meaningful patterns (e.g., <code>curl</code> reading a tar file and writing to a network socket).</li>
-            <li>Tracing dependencies with fine-grained filters (e.g., exclude benign processes like <code>ping</code>).</li>
-            <li>Binding and refining intermediate results to iteratively converge on the full attack path.</li>
-          </ul>
-          <p>
-            The result: a dramatic reduction in search space (up to <strong>58,000×</strong>) and much higher accuracy than traditional tools. Provexa supports real-world workflows that adapt to evolving attacks, enabling fast, focused, and explainable investigations.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="hero is-light is-small">
-  <div class="hero-body has-text-centered">
-    <h1 class="title is-1 mmmu">Design Overview</h1>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container" style="margin-bottom: 2vh;">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <!-- <h2 class="title is-3">Design Overview</h2> -->
+        <h2 class="title is-3">Overview</h2>
+        <!-- <h1 class="title is-3" style="font-size: xxx-large;">Overview</h1> -->
         <div class="content has-text-justified">
           <div style="display: flex; justify-content: center;">
             <img src="./static/images/provexa-arch.jpg" alt="Provexa Architecture" style="max-width:70%; height:auto;"/>
           </div>
-          <br><br>
+          <br>
           <p>
             <span class="dnerf"><strong>Provexa</strong></span> is a human-in-the-loop investigation platform designed to uncover sophisticated, multi-stage cyberattacks by analyzing massive volumes of system audit data. At its core lies <strong>ProvQL</strong>, a powerful domain-specific language tailored for security analysts working over <em>system provenance graphs</em>.
           </p>
@@ -239,9 +142,129 @@
   </div>
 </section>
 
-<section class="hero is-light is-small">
-  <div class="hero-body has-text-centered">
-    <h1 class="title is-1 mmmu">Key Takeaways</h1>
+<section class="section">
+  <div class="container" style="margin-bottom: 2vh;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Motivation</h2>
+        <!-- <h1 class="title is-3" style="font-size: xxx-large;">Motivation</h1> -->
+        <div class="content has-text-justified">
+          <div style="display: flex; justify-content: center;">
+            <img src="./static/images/demo.jpg" alt="Provexa Demo" style="max-width:100%; height:auto;"/>
+          </div>
+          <p>
+            <strong>System dependency graphs for a multi-stage, multi-host data leakage attack.</strong> The combined dependency 
+            graphs of the two victim hosts contain 100,524 nodes and 154,353 edges. The attack-relevant nodes 
+            and edges, highlighted in dark black, comprise only 20 nodes and 20 edges, indicating the significant 
+            challenge of finding <b>a needle in a haystack</b>.
+          </p>
+          <p>
+            Sophisticated cyberattacks like APTs unfold over multiple hosts and stages, often blending into normal activity. Traditional forensic tools fail to cope due to:
+          </p>
+          <ul>
+            <li><strong>Massive event volume</strong>: Millions of daily system events overwhelm analysts.</li>
+            <li><strong>Dependency explosion</strong>: Causal tracing from a single alert brings in thousands of irrelevant nodes.</li>
+            <li><strong>Lack of analyst control</strong>: Existing systems don't support iterative refinement or domain-informed filtering.</li>
+          </ul>
+          <p>
+            <strong><span class="dnerf">Provexa</span> solves this.</strong> 
+            We demonstrate how ProvQL is used to investigate the data leakage case in the figure above.
+          </p>
+          
+          <!-- Side-by-side ordered list layout -->
+          <div class="side-by-side-list">
+            <!-- Row 1: Items 1 and 2 -->
+            <div class="list-row">
+              <div class="list-item">
+                <div class="item-number">1</div>
+                <div class="item-content">
+                  We search Host 1 for a process (<code>curl</code>) that reads a <code>*.tar</code> file and immediately sends it over the network. The result from the search confirms data exfiltration involving <code>sensitive_data.tar</code>. The result is stored in poi1 for further analysis.
+                  <div class="code-block">
+                    poi1 = <span class="keyword">search</span> <span class="keyword">from</span> <span class="function">db</span>(<span class="string">host1</span>) where<br>
+                    &nbsp;&nbsp;e1{<span class="string">name="curl"</span>, <span class="string">type=process</span>},<br>
+                    &nbsp;&nbsp;e2{<span class="string">name="*.tar"</span>, <span class="string">type=file</span>},<br>
+                    &nbsp;&nbsp;e3{<span class="string">type=network</span>}<br>
+                    &nbsp;&nbsp;with e2[read] → e1 && [<1s]<br>
+                    &nbsp;&nbsp;e1[write] → e3;<br>
+                    <span class="keyword">display</span> poi1;
+                  </div>
+                </div>
+              </div>
+              <div class="list-item">
+                <div class="item-number">2</div>
+                <div class="item-content">
+                  We backtrack <code>poi1</code> on Host 1 to find the origin of the <code>sensitive_data.tar</code> file, filtering out benign processes like <code>vscode</code>. The results reveal that an <code>scp</code> process created the file by copying it from Host 2, confirming remote data transfer.
+                  <div class="code-block">
+                    g1 = <span class="keyword">back track</span> <span class="function">poi1</span> <span class="keyword">from</span> <span class="function">db</span>(<span class="string">host1</span>) <span class="keyword">exclude</span> nodes where name <span class="keyword">like</span> <span class="string">"vscode"</span>;<br>
+                    <span class="keyword">display</span> g1;
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Row 2: Items 3 and 4 -->
+            
+            <div class="list-row">
+              <div class="list-item">
+                <div class="item-number">3</div>
+                <div class="item-content">
+                  <p>We backtrack the creation of <code>sensitive_data.tar</code> on Host 2. The query reveals a <code>tar</code> process packed <code>/etc/passwd</code> and <code>/etc/shadow</code> into the archive, confirming the data collection phase of the attack.</p>
+                  <div class="code-block">
+                    g2 = <span class="keyword">back track</span> <span class="string">"sensitive_data.tar"</span> <span class="keyword">from</span> <span class="function">db</span>(<span class="string">host2</span>)<br>
+                    &nbsp;&nbsp;<span class="keyword">exclude</span> nodes where name <span class="keyword">like</span> <span class="string">"vscode"</span>;<br>
+                    <span class="keyword">display</span> g2;
+                  </div>
+                </div>
+              </div>
+              <div class="list-item">
+                <div class="item-number">4</div>
+                <div class="item-content">
+                  <p>We trace backward from the <code>curl</code> process on Host 1 to uncover the attack's entry point. Non-critical activity like <code>ping</code> is excluded. The resulting graph, stored in <code>g3</code>, helps isolate the origin of the malicious process.</p>
+                  <div class="code-block">
+                    g3 = <span class="keyword">back track</span> where exename <span class="keyword">like</span> <span class="string">"curl"</span> <span class="keyword">from</span> <span class="function">db</span>(<span class="string">host1</span>)
+                    <span class="keyword">include</span> nodes where <span class="keyword">not</span> path <span class="keyword">like</span> <span class="string">"ping"</span>;<br>
+                    <span class="keyword">display</span> g3;
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Row 3: Items 5 and 6 -->
+
+            <div class="list-row">
+              <div class="list-item">
+                <div class="item-number">5</div>
+                <div class="item-content">
+                  <p>We search the in-memory graph <code>g3</code> for events involving the attacker’s IP <code>20.69.152.188</code>. The query reveals a <code>lighttpd</code> process that reads from this IP, suggesting the attacker exploited a web server vulnerability to compromise Host 1. The result is saved in <code>poi2</code>.</p>
+                  <div class="code-block">
+                    poi2 = <span class="keyword">search</span> <span class="keyword">from</span> <span class="function">g3</span> where <br>
+                    &nbsp;&nbsp;e1{<span class="string">srcip="20.69.152.188"</span>},<br>
+                    &nbsp;&nbsp;e2{<span class="string">type=process</span>} <br>
+                    &nbsp;&nbsp;with e1[read] → e2;<br>
+                    <span class="keyword">display</span> poi2;
+                  </div>
+                </div>
+              </div>
+              <div class="list-item">
+                <div class="item-number">6</div>
+                <div class="item-content">
+                  <p>We merge <code>g1</code> and <code>g3</code> to build a comprehensive view of the attack on Host 1 (<code>g4</code>), then perform a forward trace from the entry point <code>poi2</code> within this graph. Filtering out irrelevant nodes like <code>cat</code>, the resulting trace (<code>g5</code>) captures the critical path from entry to exfiltration.</p>
+                  <div class="code-block">
+                    g4 = g1 | g3;<br>
+                    g5 = <span class="keyword">forward track</span> <span class="function">poi2</span> from <span class="function">g4</span>
+                    <span class="keyword">exclude</span> nodes where name <span class="keyword">like</span> <span class="string">"cat"</span>;<br>
+                    <span class="keyword">display</span> g5;
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p>
+            The dark paths shown in Fig. 1 visualize the output of <code>g5</code>, capturing the key attack steps with minimal noise. This showcases how ProvQL enables efficient, step-by-step investigation of complex, multi-stage attacks.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -249,10 +272,10 @@
   <div class="container" style="margin-bottom: 2vh;">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <!-- <h2 class="title is-3">Key Takeaways</h2> -->
+        <h2 class="title is-3">Key Takeaways</h2>
         <div class="content has-text-justified">
           <ul>
-            <li><strong>🔍 Massive Reduction in Noise:</strong> Provexa filters out irrelevant events, achieving up to <strong>58,000× reduction</strong> in provenance graph size and isolating only the attack-relevant paths.</li>
+            <li><strong>🔍 Massive Reduction in Noise:</strong> Provexa filters out irrelevant events, achieving significant reduction in provenance graph size and isolating only the attack-relevant paths.</li>
 
             <li><strong>🧠 Human-Centric Querying:</strong> ProvQL empowers analysts to express high-level patterns and causal hypotheses with precision, while retaining control over filters, constraints, and graph traversal semantics.</li>
 
@@ -313,9 +336,9 @@ For more details on attack scenarios, example queries, and experimental results,
 </section>
 
 <section>
-  <div id="org-banners" style="display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px 0;">
+  <div id="org-banners" style="display: flex; justify-content: center; align-items: center; gap: 40px; padding-bottom: 30px;">
     <a href="https://www.vt.edu/" target="_blank" rel="external">
-      <img class="center-block org-banner" src="static/images/vt-logo.jpg" alt="Virginia Tech Logo" style="height: 80px; width: auto; object-fit: contain; display: block;">
+      <img class="center-block org-banner" src="static/images/vt-logo.jpg" alt="Virginia Tech Logo" style="height: 60px; width: auto; object-fit: contain; display: block;">
     </a>
   </div>
 </section>
