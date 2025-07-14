@@ -1,4 +1,4 @@
-# Raptor
+# Provexa
 
 This website is adapted from the [Nerfies Website](https://nerfies.github.io)
 
