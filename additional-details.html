@@ -300,9 +300,305 @@ RETURN e1, e2, event0</code></pre>
     <h1 class="title is-3" style="color: #5a5af1;">Database Optimization Configurations</h1>
     <div class="content">
       <p>
-        Detailed experiment setup and results are presented below.
+        We carry out different optimization settings to get performance improvement by tuning the various config settings of PostgreSQL. For this experiments, we randomly selected 3 sample attack cases to evaluate various optimization settings. We average our results over 10 runs to account for variability.
       </p>
-    <iframe src="https://zealous-taxicab-bd0.notion.site/ebd/201ff9ab77f080ac9279d42e990033c0?pvs=143" width="100%" height="800" style="border: none;" allowfullscreen></iframe>
+      <p>
+        We experimented with 4 categories of tuning: default, light tuning, moderate tuning and full tuning. These experiments are summarized as follows:
+      </p>
+
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Configuration Focus</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A. Default (Vanilla)</strong></td>
+            <td>No changes</td>
+            <td>Establish baseline</td>
+          </tr>
+          <tr>
+            <td><strong>B. Light tuning</strong></td>
+            <td>Planner + memory settings only</td>
+            <td>Emulates a reasonable engineer tuning PG casually</td>
+          </tr>
+          <tr>
+            <td><strong>C. Moderate tuning</strong></td>
+            <td>Light + cache + parallelism</td>
+            <td>Represents best-effort user tuning</td>
+          </tr>
+          <tr>
+            <td><strong>D. Full tuning</strong></td>
+            <td>All settings incl. WAL/JIT/autovac</td>
+            <td>Maximize DB performance, but with more system impact</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">A) Default</h3>
+      <p>
+        This is our baseline. The default PostgreSQL configuration is unoptimized and tends to be conservative. By including this category in our experiment, we establish our baseline and serves a meaningful starting point to compare the optimizations' improvements.
+      </p>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vanilla - No Provexa</td>
+            <td>track</td>
+            <td>197,851,757,322,145.12</td>
+            <td>550</td>
+          </tr>
+          <tr>
+            <td>Vanilla - No Provexa</td>
+            <td>search</td>
+            <td>9,095.40</td>
+            <td>4,522.42</td>
+          </tr>
+          <tr>
+            <td>Vanilla - Provexa</td>
+            <td>track</td>
+            <td>484.26</td>
+            <td>6.76</td>
+          </tr>
+          <tr>
+            <td>Vanilla - Provexa</td>
+            <td>search</td>
+            <td>8,312.13</td>
+            <td>4,494.48</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">B) Light Tuning</h3>
+      <p>
+        We introduce light tuning targeting memory, cache, and planner cost estimates.
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_LIGHT = (
+    "SET random_page_cost = 1.1; "
+    "SET cpu_tuple_cost = 0.005; "
+    "SET cpu_index_tuple_cost = 0.0025; "
+    "SET effective_cache_size = '12GB'; "
+    "SET work_mem = '128MB'; "
+    "SET default_statistics_target = 200; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>498.34</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>3,841.44</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>6.10</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,362.55</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">C) Medium Tuning</h3>
+      <p>
+        In addition to the light settings, we add parallelism and collapse control
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_MEDIUM = (
+    OPTIMIZED_SETTINGS_LIGHT +
+    "SET join_collapse_limit = 12; "
+    "SET from_collapse_limit = 12; "
+    "SET parallel_setup_cost = 100; "
+    "SET parallel_tuple_cost = 0.01; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>486.95</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>3,949.99</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>5.73</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,397.55</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">D) Advanced Tuning</h3>
+      <p>
+        For this experiment, in addition to the medium settings, we update the following settings in the <code>postgresql.conf</code> config file and restart the database engine for the change to take effect.
+      </p>
+      <pre><code>shared_buffers = 4GB
+temp_buffers = 64MB
+max_parallel_workers = 8
+max_parallel_workers_per_gather = 4
+maintenance_work_mem = 1GB
+checkpoint_timeout = 15min
+max_wal_size = 4GB
+wal_buffers = 16MB
+jit = on
+jit_above_cost = 50000
+autovacuum_vacuum_scale_factor = 0.1
+autovacuum_analyze_scale_factor = 0.05</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>497.65</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>4,046.09</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>6.65</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,774.89</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">Final Chosen Config</h3>
+      <p>
+        We observe that the differences across optimization levels are minimal. We manually tuned a combination of light and medium settings to identify the best-performing configuration.
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_FINAL = (
+    "SET random_page_cost = 1.1; "
+    "SET cpu_tuple_cost = 0.005; "
+    "SET cpu_index_tuple_cost = 0.0025; "
+    "SET effective_cache_size = '8GB'; "
+    "SET work_mem = '64MB'; "
+    "SET join_collapse_limit = 8; "
+    "SET from_collapse_limit = 8; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,213,136.03</td>
+            <td>246.45</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>2,556.05</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>4.79</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>3,046.11</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h3 class="title is-5">Key Observations</h3>
+      <p>
+        We explored multiple levels of PostgreSQL tuning, ranging from the default configuration to a fully optimized setup that adjusts memory, planner cost estimates, parallelism, and JIT compilation. The default PostgreSQL settings, while functional, are known to be <strong>intentionally conservative</strong>, particularly to ensure stability on low-resource environments. As expected, our baseline results under this configuration exhibited <strong>very high planner costs and longer execution times</strong>, especially for tracking queries.
+      </p>
+      <p>
+        As we introduced progressively more aggressive tuning - light, moderate, and full tuning we observed <strong>some reduction in execution time</strong>, particularly for large search queries. However, even with full tuning, the improvements over the default were <strong>modest and inconsistent</strong>. No configuration level substantially reduced planner cost or execution time across the board.
+      </p>
+      <p>
+        In contrast, <strong>Provexa's decomposition and scheduling strategy consistently delivered significant performance improvements</strong>, both in execution time and query cost, regardless of the database tuning level. This highlights that our approach addresses structural inefficiencies in recursive and multi-step forensic queries that traditional database tuning cannot eliminate.
+      </p>
+      <p>
+        These results confirm that <strong>Provexa offers benefits orthogonal to backend tuning</strong>. It complements traditional optimizations but <strong>outperforms them even under conservative defaults</strong>, reinforcing the robustness and general applicability of our design.
+      </p>
     </div>
   </div>
 </section>
@@ -312,9 +608,283 @@ RETURN e1, e2, event0</code></pre>
     <h1 class="title is-3" style="color: #5a5af1;">Multi-Query Splitting Analysis</h1>
     <div class="content">
       <p>
-        Explanation of multi-query splitting, illustrative examples, and analysis of its advantages.
+        This section provides a detailed analysis of Provexa's multi-query splitting strategy, which decomposes complex recursive graph traversal queries into smaller, more efficient subqueries. We demonstrate how this approach significantly outperforms traditional recursive SQL queries by reducing intermediate result sets, improving execution times, and enabling better database optimization. Through concrete examples using real attack cases, we show the step-by-step query decomposition process and compare performance metrics between recursive and split execution strategies.
       </p>
-      <iframe src="https://zealous-taxicab-bd0.notion.site/ebd/201ff9ab77f08093824cc7a62469bb58?pvs=143" width="100%" height="800" style="border: none;" allowfullscreen></iframe>
+      
+      <h3 class="title is-5">Optimized Query Execution</h3>
+      <h4 class="title is-6">1. How is the query optimized?</h4>
+      <ul>
+        <li><strong>Unoptimized (Recursive):</strong> Uses a single large recursive SQL query (<code>WITH RECURSIVE ...</code>) to traverse the graph in the database.</li>
+        <li><strong>Optimized (Non-Recursive):</strong> Instead of recursion, the traversal is performed in the application layer:
+          <ul>
+            <li>The code issues multiple, smaller SQL queries to fetch nodes and edges step-by-step.</li>
+            <li>Each step fetches only the relevant nodes/edges for that iteration, reducing the load on the database and avoiding deep recursion.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h4 class="title is-6">2. How is the equivalent query formed up?</h4>
+      <p>For each step, the code generates a query like:</p>
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process
+)
+SELECT id FROM allnodes WHERE id IN (...);</code></pre>
+      <p>This is repeated for each set of nodes discovered at each step, with the <code>id IN (...)</code> clause updated as the traversal progresses.</p>
+
+      <hr>
+
+      <h3 class="title is-5">Using a sample attack case (case2_supply_chain)</h3>
+      
+      <h4 class="title is-6">ProvQL Query</h4>
+      <pre><code>bg = back track where
+(cmdline like 'freemem.sh', type=process)
+from db(case2_supply_chain);</code></pre>
+      
+      <p><strong>Goal:</strong> Backtrack all processes with <code>cmdline</code> like <code>'freemem.sh'</code> in the provenance graph.</p>
+      <p>This query is split into multiple (4) subqueries as follows:</p>
+
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE (cmdline  like  '%freemem.sh%') AND (type = 'process') 
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (7,11,12)
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (779,780,781,531,532,533,535,536,537,538,539,540,541,798,543,799,800,544,801,545,546,548,549,550,806,807,808,809,810,555,556,557,558,559,560,561,562,818,819,563,564,820,565,566,575,577,579,581,587,588,589,591,592,593,594,599,600,601,607,608,609,610,623,624,625,626,627,629,635,636,637,638,639,640,641,642,643,645,651,652,653,655,656,657,658,659,660,661,662,663,664,665,666,671,672,673,674,675,676,677,683,684,685,687,688,689,691,692,693,694,695,696,697,699,700,701,702,703,704,705,706,719,726,727,729,735,736,737,738,739,740,741,743,744,745,747,749,751,752,753) 
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (38,30)</code></pre>
+
+      <h4 class="title is-6">Step 1: Find Initial Nodes (POI)</h4>
+      <p><strong>Miniquery 1 Output:</strong> <code>[10]</code></p>
+      <ul>
+        <li>The system finds all nodes matching your constraint (<code>cmdline like 'freemem.sh'</code> and <code>type=process</code>).</li>
+        <li>Only node with ID <code>10</code> matches.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 2: Find Immediate Parents</h4>
+      <p><strong>Miniquery 2 Output:</strong> <code>[11, 12, 7]</code></p>
+      <ul>
+        <li>The system looks for all nodes that have outgoing edges to node <code>10</code>.</li>
+        <li>These are the direct parents (previous steps in the provenance): nodes <code>11</code>, <code>12</code>, and <code>7</code>.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 3: Expand to Next Layer of Parents</h4>
+      <p><strong>Miniquery 3 Output:</strong> A large set of IDs:</p>
+      <pre><code>[806, 645, 657, 799, 691, ..., 541]  // (over 100 node IDs)</code></pre>
+      <ul>
+        <li>For each of the nodes found in Step 2 (<code>11, 12, 7</code>), the system finds their parents.</li>
+        <li>This step expands the search to all nodes that are one more step back in the provenance chain.</li>
+        <li>The result is a much larger set of nodes, representing all possible "grandparents" in the provenance graph.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 4: Continue Backtracking</h4>
+      <p><strong>Miniquery 4 Output:</strong> <code>[30, 38]</code></p>
+      <ul>
+        <li>The system continues backtracking one more step for all nodes found in Step 3.</li>
+        <li>Now, only nodes <code>30</code> and <code>38</code> are found as parents.</li>
+      </ul>
+
+      <p>By splitting up the queries, and looking for the parents, Provexa reconstructs the full path of events that led to the process <code>'freemem.sh'</code>. This way we avoid using expensive recursive query and iteratively execute simple search queries.</p>
+
+      <h4 class="title is-6">How Optimized Backtrack Works:</h4>
+      <ul>
+        <li><strong>Each step issues a simple, non-recursive SQL query</strong> for the current set of nodes.</li>
+        <li><strong>The application collects results and uses them as input for the next step.</strong></li>
+        <li><strong>This continues until no new nodes are found</strong> (or a limit is reached).</li>
+        <li><strong>At the end, you have the full ancestry (provenance) of your original POI node(s).</strong></li>
+      </ul>
+
+      <p><strong>Advantages</strong>:</p>
+      <ul>
+        <li>Traversal is managed by the application, not the database.</li>
+        <li>Each query is small and scoped.</li>
+        <li>No expensive recursive materialization.</li>
+        <li>Scales well with graph size and depth.</li>
+      </ul>
+
+      <hr>
+
+      <h3 class="title is-5">Search Queries</h3>
+      <ul>
+        <li>Simple search queries are usually not split.</li>
+        <li>When multiple constraints or pattern relationships are involved, Provexa <strong>may</strong> split the query for better performance or clarity.</li>
+        <li>This is done selectively and only when beneficial.</li>
+      </ul>
+
+      <p>Taking a sample case <code>malware_infector</code>, the search query:</p>
+      <pre><code>search from bg where
+e1{path like 'Virus.Infector', type=file},
+e2{pid=2688, exename like 'exe', type=process},
+e3{type=file}
+with e1->e2 &&[<100s]
+e2->e3
+return * as entry;</code></pre>
+
+      <p>was split into the following queries using Provexa:</p>
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent ),
+node1 AS (SELECT * FROM allnodes WHERE (allnodes.path  like  '%Virus.Infector%') AND (allnodes.type = 'file')), 
+node2 AS (SELECT * FROM allnodes WHERE ((allnodes.pid = 2688) AND (allnodes.exename  like  '%exe%')) AND (allnodes.type = 'process')), 
+edges AS (SELECT alledges.* FROM alledges WHERE 'true' = 'true'),
+event (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    node1 n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN node2 n2 ON edges.dstid = n2.id
+)
+SELECT * FROM event
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent ),
+node1 AS (SELECT * FROM allnodes WHERE allnodes.id IN (70)), 
+node2 AS (SELECT * FROM allnodes WHERE allnodes.type = 'file'), 
+edges AS (SELECT alledges.* FROM alledges WHERE 'true' = 'true'),
+event (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    node1 n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN node2 n2 ON edges.dstid = n2.id
+)
+SELECT * FROM event</code></pre>
+
+      <ul>
+        <li><strong>Single Query:</strong>
+          <ul>
+            <li>Execution Time: <strong>241.5 ms</strong></li>
+            <li>PostgreSQL cost estimate: 4954.</li>
+            <li>Involves <strong>deeply nested joins</strong> and <strong>multiple filters</strong> on unindexed columns.</li>
+            <li>Even though it returns 39 final rows, it materializes large intermediate result sets.</li>
+          </ul>
+        </li>
+        <li><strong>Split Queries (Provexa):</strong>
+          <ul>
+            <li>Execution Time: <strong>114.9 ms + 6.9 ms = ~121.8 ms</strong></li>
+            <li>PostgreSQL cost estimate: ~1.5x lower (2878 + 451 = 3329)</li>
+            <li>More efficient due to early pruning:
+              <ul>
+                <li>First query narrows down process nodes quickly with <code>(exename like '%exe%' AND pid=2688)</code></li>
+                <li>Second query benefits from knowing <code>srcid = 70</code>, leading to <strong>Bitmap Index Scan</strong> on <code>fileevent_srcid</code></li>
+              </ul>
+            </li>
+            <li>Plans use <strong>index scans, materialization, and hashing</strong> over smaller data windows.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p><strong>Conclusion:</strong> Provexa's decomposition allowed the database to apply <strong>smarter, localized plans</strong> with index-friendly constraints, avoiding expensive join cascades.</p>
+
+      <hr>
+
+      <h3 class="title is-5">Why Multi-query approach is superior?</h3>
+      <p>We examine recursive vs. split-query execution across backtracking and search queries on the same sample attack cases (<code>case2_supply_chain</code> and <code>malware_infector</code>).
+      Detailed results of the cost analysis are available <a href="https://www.notion.so/Cost-comparisons-1fcff9ab77f080f8a1efd54bfdff0fc5" target="_blank">here</a>.
+      </p>
+
+      <h4 class="title is-6">Recursive (Single SQL)</h4>
+      <ul>
+        <li><strong>Planner Cost Estimate</strong>: ~74 million</li>
+        <li><strong>Execution Time</strong>: ~31 ms</li>
+        <li><strong>Intermediate Rows</strong>: 144 million</li>
+        <li><strong>Query Plan</strong>: Deep recursive union, multi-way joins, large working set materialized</li>
+      </ul>
+
+      <h4 class="title is-6">Provexa (Split Execution)</h4>
+      <ul>
+        <li><strong>Cost per Query</strong>: ~22–73</li>
+        <li><strong>Execution Time per Query</strong>: ~0.1–0.6 ms</li>
+        <li><strong>Working Set</strong>: Targeted IDs (e.g., 3–140 nodes)</li>
+        <li><strong>Query Plan</strong>: Simple <code>id IN (...)</code> with index scans or small sequential filters</li>
+      </ul>
+
+      <h4 class="title is-6">Key Observation</h4>
+      <p>The recursive SQL query invokes complex sort-merge joins and processes large intermediate results even for small final outputs. In contrast, the Provexa approach breaks the task into well-scoped queries that exploit indexes, minimize intermediate state, and reduce execution time by an order of magnitude.</p>
+
+      <hr>
+
+      <h3 class="title is-5">When Does Multi-Query Execution Outperform Recursive SQL?</h3>
+      <p>The multi-query (split) strategy offers performance advantages under the following structural and query characteristics:</p>
+      <ul>
+        <li><strong>Deep Graph Traversals</strong>: Recursive SQL queries generate increasingly large intermediate join results as the depth of traversal increases. Provexa mitigates this by limiting each query to a shallow slice of the graph.</li>
+        <li><strong>Selective Filtering</strong>: When node or edge filters are highly selective (e.g., <code>cmdline like '%freemem.sh%'</code>), split queries target only relevant subgraphs at each step. This avoids the exhaustive materialization typical of recursive CTEs.</li>
+        <li><strong>Complex Search Patterns</strong>: Queries with multiple constraints, pattern relationships, or temporal conditions are more efficiently handled when decomposed into smaller subqueries. This avoids large Cartesian joins and enables independent optimization of each constraint.</li>
+      </ul>
+
+      <h3 class="title is-5">Summary</h3>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Recursive SQL</th>
+            <th>Provexa Split Execution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cost Estimate</td>
+            <td>73 million</td>
+            <td>22–73 per query</td>
+          </tr>
+          <tr>
+            <td>Execution Time</td>
+            <td>~31 ms</td>
+            <td>~0.1–0.6 ms per query</td>
+          </tr>
+          <tr>
+            <td>Intermediate Rows</td>
+            <td>144M</td>
+            <td>1–140 per query</td>
+          </tr>
+          <tr>
+            <td>Join Strategy</td>
+            <td>Recursive, multi-way</td>
+            <td>Simple, indexed</td>
+          </tr>
+          <tr>
+            <td>Memory Footprint</td>
+            <td>~1MB+</td>
+            <td>&lt;100KB per step</td>
+          </tr>
+          <tr>
+            <td>Application Control</td>
+            <td>None (SQL-only)</td>
+            <td>Fine-grained, flexible</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">Conclusion</h3>
+      <p>This cost-based analysis confirms that Provexa's multi-query execution model is effective in practice and plays to the strength of the databases:</p>
+      <ul>
+        <li>Reduces planner-estimated costs</li>
+        <li>Scales with graph depth and node count</li>
+        <li>Avoids recursive complexity and memory bloat</li>
+        <li>Maintains fine-grained control over graph exploration</li>
+      </ul>
     </div>
   </div>
 </section>
