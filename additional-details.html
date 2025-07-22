@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supplementary Information - Provexa</title>
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/provexa-logo.png">
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="index.html">
+        <span class="icon">
+          <i class="fas fa-home"></i>
+        </span>
+        <span>Return to Home Page</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="section" style="padding-bottom: 0;">
+  <div class="container has-text-centered">
+    <h1 class="title is-2">Appendix</h1>
+    <p class="subtitle is-4">
+      Explore detailed experimental results, setup information, and supplementary materials related to <span class="dnerf">Provexa</span>.
+    </p>
+    <hr>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-3" >Table of Contents</h1>
+    <div class="content">
+      <ul>
+        <li><a href="#descriptions-of-attack-cases">Descriptions of Attack Cases Used in Evaluations</a></li>
+        <li><a href="#example-queries">Example Queries</a></li>
+        <li><a href="#survey-questions-and-results">Survey Questions and Results</a></li>
+        <li><a href="#database-optimization-configurations">Database Optimization Configurations</a></li>
+        <li><a href="#multi-query-splitting-analysis">Multi-Query Splitting Analysis</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="descriptions-of-attack-cases">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Descriptions of Attack Cases Used in Evaluations</h1>
+    <div class="content">
+      <p>
+        Attacks based on commonly used exploits.
+        <ul>
+            <li><b>Wget Executable (Case malicious_wget)</b>: The attacker uses wget to download an executable script and executes it.</li>
+            <li><b>Illegal Storage (Case malicious_illegal_store)</b>: A server administrator uses wget to download suspicious files to other users' home directory.</li>
+            <li><b>Hide File (Case malicious_hide_file)</b>: The attacker downloads a malicious file and hides it by changing its file name and location.</li>
+            <li><b>Backdoor Download (Case malicious_backdoor_dl)</b>: A malicious insider uses wget to download the backdoor malware from a compromised server and hides it among normal files.</li>
+            <li><b>Annoying Server User (Case malicious_server_usr)</b>: The annoying user logs into other users' home directories on a vulnerable server and downloads a script to write some garbage data.</li>
+            <li><b>Password-Free Theft (Case malicious_ssh_theft)</b>: The attacker logs into other users' server via ssh and appends her public key to the ~/.ssh/authorized_keys file to leave a persistent backdoor.</li>
+            <li><b>Wget-GCC-Crash (Case malicious_gcc_crash)</b>: The attacker logs into other's server via ssh, uses wget to download a C source code file, and uses GCC to compile it. The attacker then executes this malicious executable file to exhaust the memory and crash the system.</li>
+            <li><b>Scan and Login (Case malicious_scan_login)</b>: The attacker uses Nmap to explore the accessible servers whose port 22 is open for SSH connection. The attacker then uses a script to automatically test if there exists a password-less login with SSH keys to the discovered servers.</li>
+            <li><b>Password Reuse (Case malicious_pwd_reuse)</b>: An administrator decodes the /etc/shadow file with the John the Ripper password cracker, and uses the cracked password to login as another user.</li>
+            <li><b>Cheating Student (Case malicious_student)</b>: A cheating student hacks into her school's Apache server and downloads midterm scores.</li>
+        </ul>
+      </p>
+      <p>
+        <br>
+        <span style="font-weight: 600;">Multi-host multi-step intrusive attacks</span><br>
+        The attacker used an external host (Command & Control (C2) server) to perform initial penetration, distribute malware, and exfiltrate data. The first host compromised by the attacker is named as Host 1, which is a starting point to perform lateral movement and other malicious actions to compromise more hosts.
+        <ul>
+          <li><b>Shellshock Penetration (Case multistep_penetration)</b>: The attacker exploits the Shellshock vulnerability to execute arbitrary code on Host 1.</li>  
+          <li><b>Password Crack (Case multistep_password_crack)</b>: After the initial penetration on Host 1 in the previous attack, the attacker connects to Dropbox and downloads an image where C2 server's IP address is encoded in the image. Based on the IP, the attacker downloads a malware from the C2 server to Host 1. When the malware is executed, it scans the SSH configuration file to locate other reachable hosts in the network. After this discovery phase, the malware downloads another script from the C2 server and sends it to these discovered hosts to steal password from them.</li>
+          <li><b>Data Leakage (Case multistep_data_leakage)</b>: After compromising the discovered hosts, the attacker steals sensitive data files, by scanning the file system, putting files into a compressed file, and transferring it back to the C2 server.</li>
+          <li><b>Command-Line Injection (Case multistep_cmd_injection)</b>: The victim host runs Kodi Mediaplayer, which exports remote control API as a web service. One of its input sanitizations has an error that fails to filter invalid input from the outside, which in turn allows the attacker to inject arbitrary command blended in one of its requests.</li>
+          <li><b>Supply Chain Attack (Case multistep_supply_chain)</b>: The attacker discovers that the GNU Wget version that runs on a victim server is vulnerable to writing arbitrary files by deceptively redirecting requests from HTTP to a compromised FTP server (CVE-2016-4971). The attacker then embeds a common remote access trojan (RAT) into a Ubuntu package and compromises one of the Ubuntu repositories. In this way, when the victim server uses wget to download Ubuntu packages, the requests are redirected to the attacker's FTP server, and the downloaded package contains the RAT. When the victim installs the downloaded packages on the victim server, the RAT is triggered, establishing a C2 channel.</li>
+          <li><b>Phishing Email (Case multistep_phishing_email)</b>: A malicious Trojan is downloaded as an Email attachment and the enclosed macro is triggered by Microsoft Word. This allows the attacker to run arbitrary code in the context of the current user (CVE-2017-11882). After the initial penetration via the phishing email, the attacker steals sensitive data files from the compromised host.</li>
+          <li><b>Netcat Backdoor (Case multistep_netcat_backdoor)</b>: A malicious Trojan is downloaded by a victim user from a compromised HTTP server via a deceptive URL (CVE-2018-14574). The attacker penetrates into the victim host through the Trojan backdoor, and uses the netcat utility to maintain a persistent Netcat backdoor.</li>
+          <li><b>WannaCry (Case multistep_wannacry)</b>: An attacker exploits the EternalBlue vulnerability (CVE-2017-0146) in network to access the machines, and then encrypts data.</li>        
+        </ul>
+      </p>
+      <p>
+        <br>
+        <span style="font-weight: 600;">Real-world malware cases</span><br>
+        We obtained a dataset of free Windows malware samples from VirusSign. We focused on 5 largest categories (i.e., Trojan.Autorun, Trojan.Danger, Virus.Hijack, Virus.Infector, Virus.Sysbot), and we randomly selected 1 malware sample for each category.
+        <ul>
+          <li><b>Case malware_autorun</b>: Trojan.Autorun</li>
+          <li><b>Case malware_danger</b>: Trojan.Danger</li>
+          <li><b>Case malware_hijack</b>: Virus.Hijack</li>
+          <li><b>Case malware_infector</b>: Virus.Infector</li>
+          <li><b>Case malware_sysbot</b>: Virus.Sysbot</li>
+        </ul>
+      </p>
+
+      <p>
+        <br>
+        <span style="font-weight: 600;">DARPA TC attack cases</span><br>
+        We selected 3 attack cases from the DARPA Transparent Computing (TC) Engagement #5 data release. Specifically, 
+        the dataset consists of the captured system audit logs of six performer systems (i.e., ClearScope, FiveDirections, 
+        THEIA, TRACE, CADETS, and MARPLE) under the attack of the red team using different attack strategies. 
+        The audit logs include both benign system activities and attack activities. The dataset also includes a ground-truth 
+        report with attack descriptions and setups for the cases. We first retrieved the logs for the five performers with desktop
+        OS's (excluding ClearScope that runs Android). After examining the logs, we found that the logs for CADETS lack key
+        attributes (e.g., file name), making us unable to confirm the attack ground truth to conduct evaluations. In MARPLE, 
+        the attack failed. In TRACE, we found that forward tracking one step can reveal the attack sequence. Thus, we do not 
+        consider CADETS, MARPLE, and TRACE cases. Nevertheless, similar attacks were already performed for other performer systems 
+        and their logs are covered. For the other two performer systems, the attack cases for the same performer system are largely 
+        similar, and thus we selected at least one attack case from each system to include in our evaluation benchmark. To use the logs 
+        for evaluation, we developed a tool to parse the released logs and loaded the parsed system entities and system events into Provexa's databases.
+        <ul>
+            <li><b>Case tc_fivedirections_1</b>: 05092019 1326 - FiveDirections 2 - Firefox Drakon APT Elevate Copykatz Sysinfo</li>
+            <li><b>Case tc_fivedirections_2</b>: 05172019 1226 - FiveDirections 3 - Firefox DNS Drakon APT FileFilter-Elevate</li>
+            <li><b>Case tc_theia</b>: 05152019 1448 - THEIA 1 - Firefox Drakon APT BinFmt-Elevate Inject</li>
+        </ul>
+        </ul>
+       </p>
+
+       <p>
+        <br>
+        <span style="font-weight: 600;">ATLASv2 attack cases</span><br>
+        We selected 4 attack cases from the ATLASv2 Attack Engagement dataset. This dataset builds on the first version 
+        of the ATLAS dataset and includes audit logs recorded from various sources to increase the benign activities 
+        recorded to simulate a more realistic dataset with enough noise data to accompany the malicious system events. 
+        The dataset also includes a ground-truth report with attack descriptions and setups for the cases. In this dataset, 
+        two host machines were used for daily usage by two researchers to record benign activies for 4 days. In the fifth day, 
+        the malicious attacks were carried out while the victim hosts continued serving the daily use of the researchers. 
+        This captures realistic system logs that closely resemble real-world attack logs. We select 4 attack cases that involve 
+        different vulnerabilities in commonly used software - Adobe Flash and Microsoft Word.
+        <ul>
+            <li><b>Case atlasv2_s1</b>:  CVE-2015-5122    -  Adobe Flash Exploit</li>
+            <li><b>Case atlasv2_s2</b>:  CVE-2015-3105    -  Adobe Flash Exploit</li>
+            <li><b>Case atlasv2_s3</b>:  CVE-2017-11882  -  Microsoft Word Exploit</li>
+            <li><b>Case atlasv2_s4</b>:  CVE-2017-0199    -  Microsoft Word Exploit</li>
+        </ul>
+       </p>
+    </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="example-queries">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Example Queries</h1>
+    <div class="content">
+      <p>
+        We provide query examples written in different languages: ProvQL, SQL, Cypher, and Splunk SPL (search query only). 
+        We select <code>malicious_ssh_theft</code> as an example. Two queries (a backward tracking query, and a search query) are shown.<br><br>
+
+        <strong>Query 1: Backward Tracking From the POI Events</strong><br>
+        In the first query, the security analyst performs backward tracking from the POI event whose cmdline attribute contains authorized_keys.
+        <ol>
+          <li><b>ProvQL:</b> The security analyst uses the command line and type constraints to specify the POI event. The result is bound to variable bg_query1.<br>
+            <pre><code>bg_query1 = back track where (cmdline like 'authorized_keys', type=process) from db(malicious_ssh_theft);</code></pre>
+          </li>
+          <br><br>
+
+          <li><b>SQL:</b> In SQL, the security analyst uses Common Ta- ble Expressions (CTEs) to create a recursive query. WITH RECURSIVE 
+            defines recursive CTEs that unify all nodes and edges from different tables. Then, the security analyst uses SELECT 
+            to perform search.<br>
+            <pre><code>WITH RECURSIVE allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+nodes AS (SELECT * FROM allnodes),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent),
+edges AS (SELECT e.* FROM alledges e INNER JOIN nodes n1 ON e.srcid = n1.id
+INNER JOIN nodes n2 ON e.dstid = n2.id),
+graph (id, srcid, dstid, starttime, endtime, hostname, optype, amount, threshold, step) AS (
+SELECT *, edges.endtime, 1 FROM edges
+WHERE dstid IN (SELECT id FROM nodes WHERE (cmdline like authorized_keys) AND (type = process))
+UNION SELECT edges.*, LEAST(edges.endtime, graph.threshold), graph.step
+FROM edges JOIN graph ON edges.dstid = graph.srcid
+WHERE edges.starttime <= graph.threshold)
+SELECT DISTINCT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM graph;</code></pre>
+          </li>
+
+          <br><br>
+          <li><b>Cypher:</b> In Cypher, the security analyst first matches all the paths. Then, the security analyst writes
+            nested loops to traverse all relationships and joins the results.<br>
+            <pre><code></code>MATCH ()-[r]->(root)
+WHERE (root.cmdline  =~  authorized_keys) AND (root.type = process) 
+SET r.threshold = r.endtime, r.marked=true
+WITH root
+MATCH p = ()-[*..3]->(root)
+WITH DISTINCT relationships(p) as r
+FOREACH (i IN reverse(range(0, size(r)-2))
+| FOREACH (n1 IN [r[i]]
+| FOREACH (n2 IN [r[i+1]]
+| FOREACH (edge IN
+    CASE
+    WHEN n1.starttime <= n2.threshold THEN [n1]
+    ELSE []
+    END | SET edge.marked=true
+          SET n1.threshold=CASE 
+            WHEN n1.endtime > n2.threshold THEN n2.threshold
+            ELSE n1.endtime END))))
+WITH DISTINCT r
+MATCH (sn)-[rr]->(en)
+WHERE (rr IN r AND rr.marked=true)
+RETURN DISTINCT sn, rr, en</pre>
+      </p>
+    </ol>
+
+      <br><br>
+          
+      <p>
+        <strong>Query 2: Search for the Entry Nodes on the Backward Dependency Graph</strong><br>
+        In the second query, the security analyst searches for the attack entry nodes on the backward dependency graph.<br>
+        <ol>
+            <li><b>ProvQL:</b> Using ProvQL, the security analyst searches from bg_query1 bound to a local in-memory graph and specifies event relationships in a with clause. The result is bound to variable entry.<br>
+                <pre><code>search from bg_query1 where e1{exename like "ssh",type=process},
+e2{type=process}
+with e1->e2
+return * as entry;</code></pre>
+            </li>
+            <br><br>
+    
+            <li><b>SQL:</b> Since SQL does not support in-memory manage- ment, the security analyst needs to union all tables again. Then, the security analyst uses the SELECT clause to perform the search.<br>
+                <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+nodes AS (SELECT * FROM allnodes), alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent),
+edges AS (SELECT e.* FROM alledges e),
+event1 (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    nodes n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN nodes n2 ON edges.dstid = n2.id
+    WHERE ((n1.exename like ssh) AND (n1.type = process)) AND (n2.type = process) AND (edges.optype != null)),
+result AS (SELECT event1.* FROM event1 WHERE true)
+SELECT * FROM result;</code></pre>
+
+            </li>
+            <br><br>
+
+            <li><b>Cypher:</b> In Cypher, the security analyst uses MATCH to specify the pattern and uses WHERE to specify the constraints.<br>
+                <pre><code>MATCH (e1)-[event0]->(e2)
+WHERE (e1.exename =~ ssh) AND 
+(e1.type = process) AND
+e2.type = process AND true
+RETURN e1, e2, event0</code></pre>
+
+            </li>
+            <br><br>
+            <li><b>Splunk SPL:</b> In Splunk SPL, the security analyst searches different tables and uses join type=inner to join the results.<br>
+                <pre><code>| search index=process exename="ssh" type="process"
+| fields id
+| join type=inner id
+    [search index=processevent
+    | fields srcid, dstid, *]
+| join type=inner dstid
+    [search index=process type="process"
+    | fields id, *
+    | rename id as dstid]
+| table *</code></pre>
+        </ol>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="survey-questions-and-results">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Survey Questions and Results</h1>
+    <div class="content">
+      <p>
+        Detailed survey questions and results are presented below.
+      </p>
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <iframe src="https://drive.google.com/file/d/1PSalS7S_Rhf-HoMQI3wQUg5C5oejM2M1/preview" width="100%" height="600" allow="autoplay"></iframe>
+      </div>
+      <div class="column is-half">
+        <iframe src="https://drive.google.com/file/d/1617RZ4S7y-VcrYU6aKrDQlET7eb1OYRq/preview" width="100%" height="600" allow="autoplay"></iframe>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="database-optimization-configurations">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Database Optimization Configurations</h1>
+    <div class="content">
+      <p>
+        We carry out different optimization settings to get performance improvement by tuning the various config settings of PostgreSQL. For this experiments, we randomly selected 3 sample attack cases to evaluate various optimization settings. We average our results over 10 runs to account for variability.
+      </p>
+      <p>
+        We experimented with 4 categories of tuning: default, light tuning, moderate tuning and full tuning. These experiments are summarized as follows:
+      </p>
+
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Configuration Focus</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A. Default (Vanilla)</strong></td>
+            <td>No changes</td>
+            <td>Establish baseline</td>
+          </tr>
+          <tr>
+            <td><strong>B. Light tuning</strong></td>
+            <td>Planner + memory settings only</td>
+            <td>Emulates a reasonable engineer tuning PG casually</td>
+          </tr>
+          <tr>
+            <td><strong>C. Moderate tuning</strong></td>
+            <td>Light + cache + parallelism</td>
+            <td>Represents best-effort user tuning</td>
+          </tr>
+          <tr>
+            <td><strong>D. Full tuning</strong></td>
+            <td>All settings incl. WAL/JIT/autovac</td>
+            <td>Maximize DB performance, but with more system impact</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">A) Default</h3>
+      <p>
+        This is our baseline. The default PostgreSQL configuration is unoptimized and tends to be conservative. By including this category in our experiment, we establish our baseline and serves a meaningful starting point to compare the optimizations' improvements.
+      </p>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vanilla - No Provexa</td>
+            <td>track</td>
+            <td>197,851,757,322,145.12</td>
+            <td>550</td>
+          </tr>
+          <tr>
+            <td>Vanilla - No Provexa</td>
+            <td>search</td>
+            <td>9,095.40</td>
+            <td>4,522.42</td>
+          </tr>
+          <tr>
+            <td>Vanilla - Provexa</td>
+            <td>track</td>
+            <td>484.26</td>
+            <td>6.76</td>
+          </tr>
+          <tr>
+            <td>Vanilla - Provexa</td>
+            <td>search</td>
+            <td>8,312.13</td>
+            <td>4,494.48</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">B) Light Tuning</h3>
+      <p>
+        We introduce light tuning targeting memory, cache, and planner cost estimates.
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_LIGHT = (
+    "SET random_page_cost = 1.1; "
+    "SET cpu_tuple_cost = 0.005; "
+    "SET cpu_index_tuple_cost = 0.0025; "
+    "SET effective_cache_size = '12GB'; "
+    "SET work_mem = '128MB'; "
+    "SET default_statistics_target = 200; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>498.34</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>3,841.44</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>6.10</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,362.55</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">C) Medium Tuning</h3>
+      <p>
+        In addition to the light settings, we add parallelism and collapse control
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_MEDIUM = (
+    OPTIMIZED_SETTINGS_LIGHT +
+    "SET join_collapse_limit = 12; "
+    "SET from_collapse_limit = 12; "
+    "SET parallel_setup_cost = 100; "
+    "SET parallel_tuple_cost = 0.01; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>486.95</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>3,949.99</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>5.73</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,397.55</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">D) Advanced Tuning</h3>
+      <p>
+        For this experiment, in addition to the medium settings, we update the following settings in the <code>postgresql.conf</code> config file and restart the database engine for the change to take effect.
+      </p>
+      <pre><code>shared_buffers = 4GB
+temp_buffers = 64MB
+max_parallel_workers = 8
+max_parallel_workers_per_gather = 4
+maintenance_work_mem = 1GB
+checkpoint_timeout = 15min
+max_wal_size = 4GB
+wal_buffers = 16MB
+jit = on
+jit_above_cost = 50000
+autovacuum_vacuum_scale_factor = 0.1
+autovacuum_analyze_scale_factor = 0.05</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,058,575.20</td>
+            <td>497.65</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>4,046.09</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>6.65</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>4,774.89</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">Final Chosen Config</h3>
+      <p>
+        We observe that the differences across optimization levels are minimal. We manually tuned a combination of light and medium settings to identify the best-performing configuration.
+      </p>
+      <pre><code>OPTIMIZED_SETTINGS_FINAL = (
+    "SET random_page_cost = 1.1; "
+    "SET cpu_tuple_cost = 0.005; "
+    "SET cpu_index_tuple_cost = 0.0025; "
+    "SET effective_cache_size = '8GB'; "
+    "SET work_mem = '64MB'; "
+    "SET join_collapse_limit = 8; "
+    "SET from_collapse_limit = 8; "
+)</code></pre>
+      <p><strong>Results:</strong></p>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Experiment Category</th>
+            <th>Mode</th>
+            <th>Avg. Cost</th>
+            <th>Avg. Execution Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>track</td>
+            <td>72,316,505,213,136.03</td>
+            <td>246.45</td>
+          </tr>
+          <tr>
+            <td>Optimized - No Provexa</td>
+            <td>search</td>
+            <td>3,882.48</td>
+            <td>2,556.05</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>track</td>
+            <td>346.00</td>
+            <td>4.79</td>
+          </tr>
+          <tr>
+            <td>Optimized - Provexa</td>
+            <td>search</td>
+            <td>3,391.91</td>
+            <td>3,046.11</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h3 class="title is-5">Key Observations</h3>
+      <p>
+        We explored multiple levels of PostgreSQL tuning, ranging from the default configuration to a fully optimized setup that adjusts memory, planner cost estimates, parallelism, and JIT compilation. The default PostgreSQL settings, while functional, are known to be <strong>intentionally conservative</strong>, particularly to ensure stability on low-resource environments. As expected, our baseline results under this configuration exhibited <strong>very high planner costs and longer execution times</strong>, especially for tracking queries.
+      </p>
+      <p>
+        As we introduced progressively more aggressive tuning - light, moderate, and full tuning we observed <strong>some reduction in execution time</strong>, particularly for large search queries. However, even with full tuning, the improvements over the default were <strong>modest and inconsistent</strong>. No configuration level substantially reduced planner cost or execution time across the board.
+      </p>
+      <p>
+        In contrast, <strong>Provexa's decomposition and scheduling strategy consistently delivered significant performance improvements</strong>, both in execution time and query cost, regardless of the database tuning level. This highlights that our approach addresses structural inefficiencies in recursive and multi-step forensic queries that traditional database tuning cannot eliminate.
+      </p>
+      <p>
+        These results confirm that <strong>Provexa offers benefits orthogonal to backend tuning</strong>. It complements traditional optimizations but <strong>outperforms them even under conservative defaults</strong>, reinforcing the robustness and general applicability of our design.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="multi-query-splitting-analysis">
+  <div class="container">
+    <h1 class="title is-3" style="color: #5a5af1;">Multi-Query Splitting Analysis</h1>
+    <div class="content">
+      <p>
+        This section provides a detailed analysis of Provexa's multi-query splitting strategy, which decomposes complex recursive graph traversal queries into smaller, more efficient subqueries. We demonstrate how this approach significantly outperforms traditional recursive SQL queries by reducing intermediate result sets, improving execution times, and enabling better database optimization. Through concrete examples using real attack cases, we show the step-by-step query decomposition process and compare performance metrics between recursive and split execution strategies.
+      </p>
+      
+      <h3 class="title is-5">Optimized Query Execution</h3>
+      <h4 class="title is-6">1. How is the query optimized?</h4>
+      <ul>
+        <li><strong>Unoptimized (Recursive):</strong> Uses a single large recursive SQL query (<code>WITH RECURSIVE ...</code>) to traverse the graph in the database.</li>
+        <li><strong>Optimized (Non-Recursive):</strong> Instead of recursion, the traversal is performed in the application layer:
+          <ul>
+            <li>The code issues multiple, smaller SQL queries to fetch nodes and edges step-by-step.</li>
+            <li>Each step fetches only the relevant nodes/edges for that iteration, reducing the load on the database and avoiding deep recursion.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h4 class="title is-6">2. How is the equivalent query formed up?</h4>
+      <p>For each step, the code generates a query like:</p>
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process
+)
+SELECT id FROM allnodes WHERE id IN (...);</code></pre>
+      <p>This is repeated for each set of nodes discovered at each step, with the <code>id IN (...)</code> clause updated as the traversal progresses.</p>
+
+      <hr>
+
+      <h3 class="title is-5">Using a sample attack case (case2_supply_chain)</h3>
+      
+      <h4 class="title is-6">ProvQL Query</h4>
+      <pre><code>bg = back track where
+(cmdline like 'freemem.sh', type=process)
+from db(case2_supply_chain);</code></pre>
+      
+      <p><strong>Goal:</strong> Backtrack all processes with <code>cmdline</code> like <code>'freemem.sh'</code> in the provenance graph.</p>
+      <p>This query is split into multiple (4) subqueries as follows:</p>
+
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE (cmdline  like  '%freemem.sh%') AND (type = 'process') 
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (7,11,12)
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (779,780,781,531,532,533,535,536,537,538,539,540,541,798,543,799,800,544,801,545,546,548,549,550,806,807,808,809,810,555,556,557,558,559,560,561,562,818,819,563,564,820,565,566,575,577,579,581,587,588,589,591,592,593,594,599,600,601,607,608,609,610,623,624,625,626,627,629,635,636,637,638,639,640,641,642,643,645,651,652,653,655,656,657,658,659,660,661,662,663,664,665,666,671,672,673,674,675,676,677,683,684,685,687,688,689,691,692,693,694,695,696,697,699,700,701,702,703,704,705,706,719,726,727,729,735,736,737,738,739,740,741,743,744,745,747,749,751,752,753) 
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, dstip::text, dstport, srcip::text, srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process)
+SELECT id FROM allnodes WHERE id IN (38,30)</code></pre>
+
+      <h4 class="title is-6">Step 1: Find Initial Nodes (POI)</h4>
+      <p><strong>Miniquery 1 Output:</strong> <code>[10]</code></p>
+      <ul>
+        <li>The system finds all nodes matching your constraint (<code>cmdline like 'freemem.sh'</code> and <code>type=process</code>).</li>
+        <li>Only node with ID <code>10</code> matches.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 2: Find Immediate Parents</h4>
+      <p><strong>Miniquery 2 Output:</strong> <code>[11, 12, 7]</code></p>
+      <ul>
+        <li>The system looks for all nodes that have outgoing edges to node <code>10</code>.</li>
+        <li>These are the direct parents (previous steps in the provenance): nodes <code>11</code>, <code>12</code>, and <code>7</code>.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 3: Expand to Next Layer of Parents</h4>
+      <p><strong>Miniquery 3 Output:</strong> A large set of IDs:</p>
+      <pre><code>[806, 645, 657, 799, 691, ..., 541]  // (over 100 node IDs)</code></pre>
+      <ul>
+        <li>For each of the nodes found in Step 2 (<code>11, 12, 7</code>), the system finds their parents.</li>
+        <li>This step expands the search to all nodes that are one more step back in the provenance chain.</li>
+        <li>The result is a much larger set of nodes, representing all possible "grandparents" in the provenance graph.</li>
+      </ul>
+
+      <h4 class="title is-6">Step 4: Continue Backtracking</h4>
+      <p><strong>Miniquery 4 Output:</strong> <code>[30, 38]</code></p>
+      <ul>
+        <li>The system continues backtracking one more step for all nodes found in Step 3.</li>
+        <li>Now, only nodes <code>30</code> and <code>38</code> are found as parents.</li>
+      </ul>
+
+      <p>By splitting up the queries, and looking for the parents, Provexa reconstructs the full path of events that led to the process <code>'freemem.sh'</code>. This way we avoid using expensive recursive query and iteratively execute simple search queries.</p>
+
+      <h4 class="title is-6">How Optimized Backtrack Works:</h4>
+      <ul>
+        <li><strong>Each step issues a simple, non-recursive SQL query</strong> for the current set of nodes.</li>
+        <li><strong>The application collects results and uses them as input for the next step.</strong></li>
+        <li><strong>This continues until no new nodes are found</strong> (or a limit is reached).</li>
+        <li><strong>At the end, you have the full ancestry (provenance) of your original POI node(s).</strong></li>
+      </ul>
+
+      <p><strong>Advantages</strong>:</p>
+      <ul>
+        <li>Traversal is managed by the application, not the database.</li>
+        <li>Each query is small and scoped.</li>
+        <li>No expensive recursive materialization.</li>
+        <li>Scales well with graph size and depth.</li>
+      </ul>
+
+      <hr>
+
+      <h3 class="title is-5">Search Queries</h3>
+      <ul>
+        <li>Simple search queries are usually not split.</li>
+        <li>When multiple constraints or pattern relationships are involved, Provexa <strong>may</strong> split the query for better performance or clarity.</li>
+        <li>This is done selectively and only when beneficial.</li>
+      </ul>
+
+      <p>Taking a sample case <code>malware_infector</code>, the search query:</p>
+      <pre><code>search from bg where
+e1{path like 'Virus.Infector', type=file},
+e2{pid=2688, exename like 'exe', type=process},
+e3{type=file}
+with e1->e2 &&[<100s]
+e2->e3
+return * as entry;</code></pre>
+
+      <p>was split into the following queries using Provexa:</p>
+      <pre><code>WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent ),
+node1 AS (SELECT * FROM allnodes WHERE (allnodes.path  like  '%Virus.Infector%') AND (allnodes.type = 'file')), 
+node2 AS (SELECT * FROM allnodes WHERE ((allnodes.pid = 2688) AND (allnodes.exename  like  '%exe%')) AND (allnodes.type = 'process')), 
+edges AS (SELECT alledges.* FROM alledges WHERE 'true' = 'true'),
+event (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    node1 n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN node2 n2 ON edges.dstid = n2.id
+)
+SELECT * FROM event
+
+WITH allnodes (type, id, name, path, dstip, dstport, srcip, srcport, pid, exename, exepath, cmdline) AS (
+SELECT 'file', id, name, path, NULL::text, NULL::int, NULL::text, NULL::int, NULL::int, NULL::text, NULL::text, NULL::text FROM file UNION
+SELECT 'network', id, NULL::text, NULL::text, CAST (dstip AS text), dstport, CAST (srcip AS text), srcport, NULL::int, NULL::text, NULL::text, NULL::text FROM network UNION
+SELECT 'process', id, NULL::text, NULL::text, NULL::text, NULL::int, NULL::text, NULL::int, pid, exename, exepath, cmdline FROM process),
+alledges AS (
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM fileevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, amount FROM networkevent UNION
+SELECT id, srcid, dstid, starttime, endtime, hostname, optype, 0 AS amount FROM processevent ),
+node1 AS (SELECT * FROM allnodes WHERE allnodes.id IN (70)), 
+node2 AS (SELECT * FROM allnodes WHERE allnodes.type = 'file'), 
+edges AS (SELECT alledges.* FROM alledges WHERE 'true' = 'true'),
+event (id, srcid, dstid, starttime, endtime, hostname, optype, amount) AS (
+    SELECT edges.* FROM
+    node1 n1 INNER JOIN edges ON n1.id = edges.srcid
+    INNER JOIN node2 n2 ON edges.dstid = n2.id
+)
+SELECT * FROM event</code></pre>
+
+      <ul>
+        <li><strong>Single Query:</strong>
+          <ul>
+            <li>Execution Time: <strong>241.5 ms</strong></li>
+            <li>PostgreSQL cost estimate: 4954.</li>
+            <li>Involves <strong>deeply nested joins</strong> and <strong>multiple filters</strong> on unindexed columns.</li>
+            <li>Even though it returns 39 final rows, it materializes large intermediate result sets.</li>
+          </ul>
+        </li>
+        <li><strong>Split Queries (Provexa):</strong>
+          <ul>
+            <li>Execution Time: <strong>114.9 ms + 6.9 ms = ~121.8 ms</strong></li>
+            <li>PostgreSQL cost estimate: ~1.5x lower (2878 + 451 = 3329)</li>
+            <li>More efficient due to early pruning:
+              <ul>
+                <li>First query narrows down process nodes quickly with <code>(exename like '%exe%' AND pid=2688)</code></li>
+                <li>Second query benefits from knowing <code>srcid = 70</code>, leading to <strong>Bitmap Index Scan</strong> on <code>fileevent_srcid</code></li>
+              </ul>
+            </li>
+            <li>Plans use <strong>index scans, materialization, and hashing</strong> over smaller data windows.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p><strong>Conclusion:</strong> Provexa's decomposition allowed the database to apply <strong>smarter, localized plans</strong> with index-friendly constraints, avoiding expensive join cascades.</p>
+
+      <hr>
+
+      <h3 class="title is-5">Why Multi-query approach is superior?</h3>
+      <p>We examine recursive vs. split-query execution across backtracking and search queries on the same sample attack cases (<code>case2_supply_chain</code> and <code>malware_infector</code>).
+      Detailed results of the cost analysis are available <a href="https://www.notion.so/Cost-comparisons-1fcff9ab77f080f8a1efd54bfdff0fc5" target="_blank">here</a>.
+      </p>
+
+      <h4 class="title is-6">Recursive (Single SQL)</h4>
+      <ul>
+        <li><strong>Planner Cost Estimate</strong>: ~74 million</li>
+        <li><strong>Execution Time</strong>: ~31 ms</li>
+        <li><strong>Intermediate Rows</strong>: 144 million</li>
+        <li><strong>Query Plan</strong>: Deep recursive union, multi-way joins, large working set materialized</li>
+      </ul>
+
+      <h4 class="title is-6">Provexa (Split Execution)</h4>
+      <ul>
+        <li><strong>Cost per Query</strong>: ~22–73</li>
+        <li><strong>Execution Time per Query</strong>: ~0.1–0.6 ms</li>
+        <li><strong>Working Set</strong>: Targeted IDs (e.g., 3–140 nodes)</li>
+        <li><strong>Query Plan</strong>: Simple <code>id IN (...)</code> with index scans or small sequential filters</li>
+      </ul>
+
+      <h4 class="title is-6">Key Observation</h4>
+      <p>The recursive SQL query invokes complex sort-merge joins and processes large intermediate results even for small final outputs. In contrast, the Provexa approach breaks the task into well-scoped queries that exploit indexes, minimize intermediate state, and reduce execution time by an order of magnitude.</p>
+
+      <hr>
+
+      <h3 class="title is-5">When Does Multi-Query Execution Outperform Recursive SQL?</h3>
+      <p>The multi-query (split) strategy offers performance advantages under the following structural and query characteristics:</p>
+      <ul>
+        <li><strong>Deep Graph Traversals</strong>: Recursive SQL queries generate increasingly large intermediate join results as the depth of traversal increases. Provexa mitigates this by limiting each query to a shallow slice of the graph.</li>
+        <li><strong>Selective Filtering</strong>: When node or edge filters are highly selective (e.g., <code>cmdline like '%freemem.sh%'</code>), split queries target only relevant subgraphs at each step. This avoids the exhaustive materialization typical of recursive CTEs.</li>
+        <li><strong>Complex Search Patterns</strong>: Queries with multiple constraints, pattern relationships, or temporal conditions are more efficiently handled when decomposed into smaller subqueries. This avoids large Cartesian joins and enables independent optimization of each constraint.</li>
+      </ul>
+
+      <h3 class="title is-5">Summary</h3>
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Recursive SQL</th>
+            <th>Provexa Split Execution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cost Estimate</td>
+            <td>73 million</td>
+            <td>22–73 per query</td>
+          </tr>
+          <tr>
+            <td>Execution Time</td>
+            <td>~31 ms</td>
+            <td>~0.1–0.6 ms per query</td>
+          </tr>
+          <tr>
+            <td>Intermediate Rows</td>
+            <td>144M</td>
+            <td>1–140 per query</td>
+          </tr>
+          <tr>
+            <td>Join Strategy</td>
+            <td>Recursive, multi-way</td>
+            <td>Simple, indexed</td>
+          </tr>
+          <tr>
+            <td>Memory Footprint</td>
+            <td>~1MB+</td>
+            <td>&lt;100KB per step</td>
+          </tr>
+          <tr>
+            <td>Application Control</td>
+            <td>None (SQL-only)</td>
+            <td>Fine-grained, flexible</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="title is-5">Conclusion</h3>
+      <p>This cost-based analysis confirms that Provexa's multi-query execution model is effective in practice and plays to the strength of the databases:</p>
+      <ul>
+        <li>Reduces planner-estimated costs</li>
+        <li>Scales with graph depth and node count</li>
+        <li>Avoids recursive complexity and memory bloat</li>
+        <li>Maintains fine-grained control over graph exploration</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        © 2025 Provexa. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
